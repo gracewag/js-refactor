@@ -1,47 +1,84 @@
 function update_quality(items) {
   for (var i = 0; i < items.length; i++) {
-    if (items[i].name != 'Aged Brie' && items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-      if (items[i].quality > 0) {
-        if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-          items[i].quality = items[i].quality - 1
-        }
-      }
-    } else {
-      if (items[i].quality < 50) {
-        items[i].quality = items[i].quality + 1
-        if (items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-          if (items[i].sell_in < 11) {
-            if (items[i].quality < 50) {
-              items[i].quality = items[i].quality + 1
-            }
-          }
-          if (items[i].sell_in < 6) {
-            if (items[i].quality < 50) {
-              items[i].quality = items[i].quality + 1
-            }
-          }
-        }
-      }
-    }
-    if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-      items[i].sell_in = items[i].sell_in - 1;
-    }
-    if (items[i].sell_in < 0) {
-      if (items[i].name != 'Aged Brie') {
-        if (items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-          if (items[i].quality > 0) {
-            if (items[i].name != 'Sulfuras, Hand of Ragnaros') {
-              items[i].quality = items[i].quality - 1
-            }
-          }
-        } else {
-          items[i].quality = items[i].quality - items[i].quality
-        }
-      } else {
-        if (items[i].quality < 50) {
-          items[i].quality = items[i].quality + 1
-        }
-      }
-    }
+    items[i] = handleItem(items[i]);
   }
+}
+
+function handleItem(item)
+{
+    item.sell_in--;
+    
+    switch(item.name)
+    {
+        case 'Backstage passes to a TAFKAL80ETC concert':
+            // special cases for backstage passes
+            if(item.sell_in < 0)
+            {
+                item.quality = 0;
+                break;
+            }
+            
+            if(item.sell_in < 10)
+            {
+                item = improves(item);
+                if(item.sell_in < 3)
+                {
+                    item = improves(item);
+                }
+            }
+        
+        case 'Aged Brie':
+            item = improves(item);
+            
+            // won't improve backstage passes again because that's already 0 above
+            if(item.sell_in < 0)
+            {
+                item = improves(item);
+            }
+            
+            break;
+        
+        case 'Sulfuras, Hand of Ragnaros':
+            item = legendary(item);
+            break;
+        
+        default:
+            item = degrades(item);
+            break;
+    }
+    
+    return item;
+}
+
+function improves(item)
+{
+    item.quality++;
+    if(item.quality >= 50)
+    {
+        item.quality = 50;
+    }
+    
+    return item;
+}
+
+function degrades(item)
+{
+    item.quality--;
+    if(item.sell_in < 0)
+    {
+        item.quality--;
+    }
+    
+    if(item.quality < 0)
+    {
+        item.quality = 0;
+    }
+    
+    return item;
+}
+
+function legendary(item)
+{
+    item.sell_in++;
+    return item;
 }
