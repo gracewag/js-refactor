@@ -102,5 +102,19 @@ describe("Allison's Inn Inventory System", function() {
       update_quality(items);
       expect(items[0].quality).toBe(12);
   });
+  
+  it('quality degrades by 2 for conjured items with positive sell_in', function() {
+      var items = [];
+      items.push(new Item('Conjured Item', 2, 10));
+      update_quality(items);
+      expect(items[0].quality).toBe(8);
+  });
+  
+  it('quality degrades by 4 for conjured items with negative sell_in', function() {
+      var items = [];
+      items.push(new Item('Conjured Item', 0, 10));
+      update_quality(items);
+      expect(items[0].quality).toBe(6);
+  });
 
 });

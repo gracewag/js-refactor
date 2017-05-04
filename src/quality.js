@@ -42,6 +42,9 @@ function handleItem(item)
             item = legendary(item);
             break;
         
+        case 'Conjured Item':
+            item = degrades(item);
+        
         default:
             item = degrades(item);
             break;
